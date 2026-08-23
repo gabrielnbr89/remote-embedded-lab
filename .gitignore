@@ -5,8 +5,9 @@
 docs/hojas-de-ruta/*
 
 # =========================
-# Node.js
+# firmware
 # =========================
 
 **/.vscode
 **/.pio
+**/secrets.h
