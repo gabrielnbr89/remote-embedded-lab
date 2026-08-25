@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 // Hardware
-constexpr uint8_t RELAY_PIN = 2;
+constexpr uint8_t RELAY_PIN = 0;
 
 // Timing
 constexpr unsigned long WIFI_RECONNECT_INTERVAL = 10000;
