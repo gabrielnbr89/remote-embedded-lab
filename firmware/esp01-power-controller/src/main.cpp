@@ -4,6 +4,7 @@
 #include "relay.h"
 #include "storage.h"
 #include "wifi.h"
+#include "logger.h"
 
 void setup()
 {
@@ -17,4 +18,5 @@ void loop()
 {
     wifi_update();
     mqtt_update();
+    logger_update();
 }

@@ -10,16 +10,19 @@
 
 namespace
 {
-    void logger_publish(JsonDocument& document)
+    unsigned long lastHeartbeat = 0;
+
+    //Publica en eventos por defecto pero se puede especificar otro topic. Ej: MQTT_TOPIC_HEARTBEAT
+
+    void logger_publish(JsonDocument &document, const char* topic = MQTT_TOPIC_EVENTS)
     {
         char payload[MQTT_PAYLOAD_SIZE];
 
         serializeJson(document, payload, sizeof(payload));
 
-        mqtt_publish(MQTT_TOPIC_EVENTS, payload);
+        mqtt_publish(topic, payload);
     }
 }
-
 
 void logger_startup()
 {
@@ -70,7 +73,7 @@ void logger_mqtt_reconnected()
     mqtt_reset_connection_attempts();
 }
 
-void logger_relay_command(JsonDocument& commandPayload)
+void logger_relay_command(JsonDocument &commandPayload)
 {
     JsonDocument document;
 
@@ -78,4 +81,26 @@ void logger_relay_command(JsonDocument& commandPayload)
     document["command"] = commandPayload["command"];
 
     logger_publish(document);
+}
+
+void logger_heartbeat()
+{
+    JsonDocument document;
+
+    document["device_id"] = DEVICE_ID;
+    document["relay"] = relay_get_state();
+
+    logger_publish(document, MQTT_TOPIC_HEARTBEAT);
+}
+
+void logger_update()
+{
+    const unsigned long now = millis();
+
+    if (now - lastHeartbeat < HEARTBEAT_INTERVAL)
+        return;
+
+    lastHeartbeat = now;
+
+    logger_heartbeat();
 }

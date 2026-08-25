@@ -17,11 +17,13 @@ namespace
     PubSubClient mqttClient(wifiClient);
 
     unsigned long lastMqttAttempt = 0;
+    unsigned long mqttFailsafe = 0;
     uint32_t mqttConnectionAttempts = 0;
 
     bool mqttHasConnected = false;
+    bool mqttFailsafeTriggered = false;
 
-    void mqtt_callback(char* topic, byte* payload, unsigned int length)
+    void mqtt_callback(char *topic, byte *payload, unsigned int length)
     {
         if (strcmp(topic, MQTT_TOPIC_COMMAND) == 0)
         {
@@ -63,6 +65,7 @@ namespace
                 MQTT_USER,
                 MQTT_PASSWORD))
         {
+
             return;
         }
 
@@ -90,13 +93,35 @@ void mqtt_init()
 
 void mqtt_update()
 {
+    const unsigned long now = millis();
+
+    if (!mqttClient.connected())
+    {
+        if (mqttFailsafe == 0)
+        {
+            mqttFailsafe = now;
+        }
+
+        if (now - mqttFailsafe >= MQTT_FAILSAFE_TIMEOUT)
+        {
+            if (!mqttFailsafeTriggered)
+            {
+                mqttFailsafeTriggered = true;
+                relay_set(false);
+            }
+        }
+    }
+    else
+    {
+        mqttFailsafeTriggered = false;
+        mqttFailsafe = 0;
+    }
+
     if (!wifi_is_connected())
         return;
 
     if (!mqttClient.connected())
     {
-        const unsigned long now = millis();
-
         if (now - lastMqttAttempt >= MQTT_RECONNECT_INTERVAL)
         {
             mqtt_connect();
@@ -118,7 +143,7 @@ uint32_t mqtt_get_connection_attempts()
     return mqttConnectionAttempts;
 }
 
-bool mqtt_publish(const char* topic, const char* payload)
+bool mqtt_publish(const char *topic, const char *payload)
 {
     if (!mqttClient.connected())
         return false;

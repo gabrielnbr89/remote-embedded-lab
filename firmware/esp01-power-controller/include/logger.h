@@ -5,5 +5,7 @@ void logger_startup();
 void logger_wifi_reconnected();
 void logger_mqtt_reconnected();
 void logger_relay_command(JsonDocument& commandPayload);
+void logger_heartbeat();
+void logger_update();
 
 #endif

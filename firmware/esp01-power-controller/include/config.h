@@ -4,12 +4,12 @@
 #include <stdint.h>
 
 // Hardware
-constexpr uint8_t RELAY_PIN = 0;
+constexpr uint8_t RELAY_PIN = 2;
 
 // Timing
 constexpr unsigned long WIFI_RECONNECT_INTERVAL = 10000;
 constexpr unsigned long MQTT_RECONNECT_INTERVAL = 5000;
-constexpr unsigned long HEARTBEAT_INTERVAL = 60000;
+constexpr unsigned long HEARTBEAT_INTERVAL = 30000;
 constexpr unsigned long MQTT_FAILSAFE_TIMEOUT = 60000;
 
 // MQTT
@@ -33,5 +33,8 @@ constexpr char MQTT_TOPIC_STATE[] =
 
 constexpr char MQTT_TOPIC_STATE_REQUEST[] =
     "lab/devices/esp01-power/state/request";
+
+    constexpr char MQTT_TOPIC_HEARTBEAT[] =
+    "lab/devices/esp01-power/heartbeat";
 
 #endif
